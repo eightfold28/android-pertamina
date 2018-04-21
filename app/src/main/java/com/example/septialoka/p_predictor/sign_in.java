@@ -15,7 +15,7 @@ public class sign_in extends AppCompatActivity {
         findViewById(R.id.text_sign_in).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(sign_in.this, navigation_menu.class);
+                Intent i = new Intent(sign_in.this, MapsActivity.class);
                 startActivity(i);
             }
         });
