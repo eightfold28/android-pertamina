@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@drawable/bg_gradient"
+    tools:context=".sign_in">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginBottom="35dp">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Silahkan Masuk"
+                android:textSize="20sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="normal"
+                android:textColor="#e9f4e9"
+                android:letterSpacing="0.0"
+                android:lineSpacingExtra="8sp"
+                android:gravity="center_horizontal"
+                android:layout_marginBottom="74dp"/>
+            <EditText
+                android:hint="Email address"
+                android:inputType="textEmailAddress"
+                android:layout_width="match_parent"
+                android:theme="@style/ThemeEditText"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:hint="Password"
+                android:layout_width="match_parent"
+                android:inputType="textPassword"
+                android:theme="@style/ThemeEditText"
+                android:layout_height="wrap_content" />
+            <Button
+                android:layout_width="match_parent"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:textStyle="bold"
+                android:textColor="#ffffff"
+                android:letterSpacing="0.01"
+                android:id="@+id/text_sign_in"
+                android:background="@drawable/button_bg"
+                android:layout_height="wrap_content"
+                android:text="SIGN IN"/>
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
