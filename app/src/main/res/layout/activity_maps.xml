@@ -16,24 +16,28 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="25 January 2018"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-thin"
-        android:textSize="20sp"
-        android:layout_alignParentBottom="true"
-        android:padding="16dp"
-        android:id="@+id/text_date"
-        android:background="#CCFFFFFF"/>
-
-    <ProgressBar
-        android:id="@+id/progress_predict"
+    <Spinner
+        android:id="@+id/spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentRight="true"/>
 
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/progress_predict"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_height="wrap_content"
+        android:background="#DDFFFFFF"
+        android:text="Pilih Tanggal"
+        android:padding="16dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:id="@+id/text_date"/>
 
 </RelativeLayout>

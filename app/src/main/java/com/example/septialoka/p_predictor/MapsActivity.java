@@ -2,6 +2,7 @@ package com.example.septialoka.p_predictor;
 
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,20 +27,24 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.rio.xpredicter.RetCon;
-import org.rio.xpredicter.XPredicter;
+import org.rio.xpredicter.*;
 
+import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final String TAG = "MAPS_ACTIVITY";
+    private Spinner spinner;
     private TextView textDate;
     private ProgressBar progressPredict;
     private MarkerOptions marker;
-    private List<Double> currentData;
+    public static ModelPredictor currentData;
+    String tanggalHariIni = "";
+    Integer stepDate = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +55,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
         textDate = findViewById(R.id.text_date);
         progressPredict = findViewById(R.id.progress_predict);
 
+        Calendar calendar = Calendar.getInstance();
+        Date now = calendar.getTime();
+
+        String tanggal = String.valueOf(now.getDate())+ "/" + String.valueOf(now.getMonth() + 1) + "/" + String.valueOf("2018");
+        tanggalHariIni = tanggal;
+        textDate.setText(tanggal);
+
+        Log.d("lala", tanggalHariIni);
+
         showLoading(false);
-        textDate.setText("Pilih Tanggal");
         textDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,33 +77,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
                         String tanggal;
 
-                        tanggal = String.valueOf(dayOfMonth)+ "/" + String.valueOf(month) + "/" + String.valueOf(year);
+                        Calendar start = Calendar.getInstance();
+                        Calendar end = Calendar.getInstance();
+                        end.set(year, month, dayOfMonth);
+                        Date startDate = start.getTime();
+                        Date endDate = end.getTime();
+                        long startTime = startDate.getTime();
+                        long endTime = endDate.getTime();
+                        long diffTime = endTime - startTime;
+                        Long diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+                        stepDate = diffDays.intValue();
+
+                        tanggal = String.valueOf(dayOfMonth)+ "/" + String.valueOf(month + 1) + "/" + String.valueOf(year);
+                        tanggalHariIni = tanggal;
                         textDate.setText(tanggal);
-                        showLoading(true);
-
-                        XPredicter.getInstance().getPrediction(50, "g", new RetCon.CallbackRet() {
-                            @Override
-                            public void success(Object o) {
-                                currentData = (List<Double>) o;
-                                showLoading(false);
-                            }
-
-                            @Override
-                            public void failure(String messageError) {
-                                currentData = null;
-                                Toast.makeText(MapsActivity.this, messageError, Toast.LENGTH_SHORT).show();
-                                showLoading(false);
-                            }
-                        });
                     }
                 });
             }
         });
-    }
 
-    private void showLoading(Boolean yes){
-        progressPredict.setVisibility(yes ? View.VISIBLE : View.GONE);
-        textDate.setVisibility(!yes ? View.VISIBLE : View.GONE);
+
+//        spinner = (Spinner) findViewById(R.id.spinner);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MapsActivity.this,
+//                android.R.layout.simple_spinner_item,paths);
+//
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
+
     }
 
 
@@ -124,17 +141,67 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng spbu_yossudarso = new LatLng(-6.1534098,106.886117);
         LatLng spbu_danausunter = new LatLng(-6.1464125,106.872846);
 
-        marker = new MarkerOptions().position(depot_plumpang).title("DEPOT PLUMPANG").icon(BitmapDescriptorFactory.fromResource(R.drawable.depotup));
-        mMap.addMarker(marker);
-        mMap.addMarker(new MarkerOptions().position(spbu_yossudarso).title("SPBU YOS SUDARSO").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
-        mMap.addMarker(new MarkerOptions().position(spbu_sunter).title("SPBU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
-        mMap.addMarker(new MarkerOptions().position(spbu_gayamotor).title("SPBU GAYA MOTOR").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
-        mMap.addMarker(new MarkerOptions().position(spbu_danausunter).title("SPBU DANAU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
+        final Marker d1 = mMap.addMarker(new MarkerOptions().position(depot_plumpang).title("DEPOT PLUMPANG").icon(BitmapDescriptorFactory.fromResource(R.drawable.depotup)));
+        final Marker d2 = mMap.addMarker(new MarkerOptions().position(spbu_yossudarso).title("SPBU YOS SUDARSO").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
+        final Marker d3 = mMap.addMarker(new MarkerOptions().position(spbu_sunter).title("SPBU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
+        final Marker d4 = mMap.addMarker(new MarkerOptions().position(spbu_gayamotor).title("SPBU GAYA MOTOR").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
+        final Marker d5 = mMap.addMarker(new MarkerOptions().position(spbu_danausunter).title("SPBU DANAU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
 
+        final HahaBox hb = new HahaBox(MapsActivity.this);
+        hb.setOacklik(new HahaBox.OnARClickListener() {
+            @Override
+            public void onClickG() {
+                showLoading(true);
+
+                XPredicter.getInstance().getPrediction(7, "g", stepDate, new RetCon.CallbackRet() {
+                    @Override
+                    public void success(Object o) {
+                        currentData = (ModelPredictor) o;
+                        Intent i = new Intent(MapsActivity.this, GraphActivity.class);
+                        i.putExtra("data_predict", currentData);
+                        startActivity(i);
+                        showLoading(false);
+                    }
+
+                    @Override
+                    public void failure(String messageError) {
+                        currentData = null;
+                        Toast.makeText(MapsActivity.this, messageError, Toast.LENGTH_SHORT).show();
+                        showLoading(false);
+                    }
+                });
+            }
+
+            @Override
+            public void onClickD() {
+                showLoading(true);
+
+                XPredicter.getInstance().getPrediction(7, "d", stepDate, new RetCon.CallbackRet() {
+                    @Override
+                    public void success(Object o) {
+                        currentData = (ModelPredictor) o;
+                        Intent i = new Intent(MapsActivity.this, GraphActivity.class);
+                        i.putExtra("data_predict", currentData);
+                        startActivity(i);
+                        showLoading(false);
+                    }
+
+                    @Override
+                    public void failure(String messageError) {
+                        currentData = null;
+                        Toast.makeText(MapsActivity.this, messageError, Toast.LENGTH_SHORT).show();
+                        showLoading(false);
+                    }
+                });
+            }
+        });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker _marker) {
-//                Log.d()
+            public boolean onMarkerClick(Marker marker) {
+                hb.setTextTitle(marker.getTitle());
+                hb.setTextData(tanggalHariIni);
+
+                hb.show();
                 return false;
             }
         });
@@ -146,6 +213,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .tilt(50)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+    }
+
+    private void showLoading(boolean ya){
+        progressPredict.setVisibility(ya ? View.VISIBLE : View.GONE);
+        textDate.setVisibility(!ya ? View.VISIBLE : View.GONE);
     }
 
 
@@ -154,6 +228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
+
 
         DatePickerDialog datePicker = new DatePickerDialog(MapsActivity.this, dateSetListener, year, month, day );
         datePicker.show();
