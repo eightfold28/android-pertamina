@@ -10,6 +10,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,15 +22,23 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.rio.xpredicter.RetCon;
+import org.rio.xpredicter.XPredicter;
+
 import java.util.Calendar;
+import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final String TAG = "MAPS_ACTIVITY";
-    private Button date;
+    private TextView textDate;
+    private ProgressBar progressPredict;
+    private MarkerOptions marker;
+    private List<Double> currentData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +49,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        date = findViewById(R.id.btn1);
-        date.setOnClickListener(new View.OnClickListener() {
+        textDate = findViewById(R.id.text_date);
+        progressPredict = findViewById(R.id.progress_predict);
+
+        showLoading(false);
+        textDate.setText("Pilih Tanggal");
+        textDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDialog(new DatePickerDialog.OnDateSetListener() {
@@ -48,11 +63,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         String tanggal;
 
                         tanggal = String.valueOf(dayOfMonth)+ "/" + String.valueOf(month) + "/" + String.valueOf(year);
-                        date.setText(tanggal);
+                        textDate.setText(tanggal);
+                        showLoading(true);
+
+                        XPredicter.getInstance().getPrediction(50, "g", new RetCon.CallbackRet() {
+                            @Override
+                            public void success(Object o) {
+                                currentData = (List<Double>) o;
+                                showLoading(false);
+                            }
+
+                            @Override
+                            public void failure(String messageError) {
+                                currentData = null;
+                                Toast.makeText(MapsActivity.this, messageError, Toast.LENGTH_SHORT).show();
+                                showLoading(false);
+                            }
+                        });
                     }
                 });
             }
         });
+    }
+
+    private void showLoading(Boolean yes){
+        progressPredict.setVisibility(yes ? View.VISIBLE : View.GONE);
+        textDate.setVisibility(!yes ? View.VISIBLE : View.GONE);
     }
 
 
@@ -88,11 +124,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng spbu_yossudarso = new LatLng(-6.1534098,106.886117);
         LatLng spbu_danausunter = new LatLng(-6.1464125,106.872846);
 
-        mMap.addMarker(new MarkerOptions().position(depot_plumpang).title("DEPOT PLUMPANG").icon(BitmapDescriptorFactory.fromResource(R.drawable.depotup)));
+        marker = new MarkerOptions().position(depot_plumpang).title("DEPOT PLUMPANG").icon(BitmapDescriptorFactory.fromResource(R.drawable.depotup));
+        mMap.addMarker(marker);
         mMap.addMarker(new MarkerOptions().position(spbu_yossudarso).title("SPBU YOS SUDARSO").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
         mMap.addMarker(new MarkerOptions().position(spbu_sunter).title("SPBU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
         mMap.addMarker(new MarkerOptions().position(spbu_gayamotor).title("SPBU GAYA MOTOR").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbudown)));
         mMap.addMarker(new MarkerOptions().position(spbu_danausunter).title("SPBU DANAU SUNTER").icon(BitmapDescriptorFactory.fromResource(R.drawable.spbuup)));
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker _marker) {
+//                Log.d()
+                return false;
+            }
+        });
 
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(depot_plumpang)      // Sets the center of the map to Mountain View
@@ -101,8 +146,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .tilt(50)                   // Sets the tilt of the camera to 30 degrees
                 .build();                   // Creates a CameraPosition from the builder
         mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
     }
 
 
@@ -111,7 +154,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-
 
         DatePickerDialog datePicker = new DatePickerDialog(MapsActivity.this, dateSetListener, year, month, day );
         datePicker.show();

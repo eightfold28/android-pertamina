@@ -1,1 +1,2 @@
-include ':app'
+include ':app', ':xpredicter2'
+project(':xpredicter2').projectDir = new File('xpredicter')
