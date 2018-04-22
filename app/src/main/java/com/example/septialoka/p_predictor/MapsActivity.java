@@ -1,9 +1,15 @@
 package com.example.septialoka.p_predictor;
 
+import android.app.DatePickerDialog;
+import android.app.DialogFragment;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -15,10 +21,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Calendar;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final String TAG = "MAPS_ACTIVITY";
+    private Button date;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +37,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        date = findViewById(R.id.btn1);
+        date.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialog(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                        String tanggal;
+
+                        tanggal = String.valueOf(dayOfMonth)+ "/" + String.valueOf(month) + "/" + String.valueOf(year);
+                        date.setText(tanggal);
+                    }
+                });
+            }
+        });
     }
 
 
@@ -79,4 +104,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     }
+
+
+    public void showDialog (DatePickerDialog.OnDateSetListener dateSetListener) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+
+        DatePickerDialog datePicker = new DatePickerDialog(MapsActivity.this, dateSetListener, year, month, day );
+        datePicker.show();
+    }
+
+
 }
