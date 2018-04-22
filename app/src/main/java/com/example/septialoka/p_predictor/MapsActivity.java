@@ -2,14 +2,18 @@ package com.example.septialoka.p_predictor;
 
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Spinner;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -27,7 +31,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private static final String TAG = "MAPS_ACTIVITY";
-    private Button date;
+    private Button date, graf;
+    private Spinner spinner;
+    private static final String[] paths = {"Premium", "Pertalite", "Pertamax", "Solar"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +59,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 });
             }
         });
+
+        graf = findViewById(R.id.btngraf);
+        graf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MapsActivity.this, GraphActivity.class);
+                startActivity(i);
+            }
+        });
+
+
+//        spinner = (Spinner) findViewById(R.id.spinner);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MapsActivity.this,
+//                android.R.layout.simple_spinner_item,paths);
+//
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener((AdapterView.OnItemSelectedListener) this);
+
     }
 
 

@@ -25,6 +25,21 @@
         android:layout_marginBottom="24dp"
         android:id="@+id/btn1" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Graf"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
+        android:id="@+id/btngraf" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_alignParentRight="true"/>
+
 
 
 </RelativeLayout>
